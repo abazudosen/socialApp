@@ -1,0 +1,12 @@
+{
+  "name": "smApp",
+  "displayName": "smApp",
+  "expo": {
+    "name": "smApp",
+    "slug": "smApp",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
