@@ -21,11 +21,13 @@ export default function PostScreen({ navigation }) {
   const [text, setText] = useState("");
   const [imagestate, setImageState] = useState();
 
+  const [user, setUser] = useState({});
+
   useEffect(() => {
     getPhotoPermission();
   }, []);
 
-  async function getPhotoPermission({ navigation }) {
+  async function getPhotoPermission() {
     if (Contants.platform.ios) {
       const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
       if (status != "granted") {
@@ -39,10 +41,10 @@ export default function PostScreen({ navigation }) {
 
     Fire.shared
       .addPost({
-        // name: user.name,
+        name: user.name,
         text: text.trim(),
         localUri: imagestate,
-        //uri: user.avatar,
+        uri: user.avatar,
       })
       .then((ref) => {
         setText();
