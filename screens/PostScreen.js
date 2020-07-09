@@ -13,28 +13,39 @@ import Contants from "expo-constants";
 import * as Permissions from "expo-permissions";
 import Fire from "../Fire";
 import * as ImagePicker from "expo-image-picker";
+import UserPermissions from "../utilities/UserPermission";
 
 const firebase = require("firebase");
 require("firebase/firestore");
 
 export default function PostScreen({ navigation }) {
+  const [loading, setLoading] = useState(false);
+  const [avatar, setAvatar] = useState();
   const [text, setText] = useState("");
   const [imagestate, setImageState] = useState();
 
   const [user, setUser] = useState({});
 
   useEffect(() => {
-    getPhotoPermission();
+    getUser();
   }, []);
 
-  async function getPhotoPermission() {
-    if (Contants.platform.ios) {
-      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-      if (status != "granted") {
-        alert("We need permission to access your camera roll");
-      }
-    }
+  async function getUser() {
+    let unsubscribe = null;
+    const userId = Fire.shared.uid;
+
+    unsubscribe = await Fire.shared.firestore
+      .collection("users")
+      .doc(userId)
+      .onSnapshot((doc) => {
+        setUser(doc.data());
+      });
+    // console.tron.log(user);
   }
+
+  useEffect(() => {
+    UserPermissions.getCameraPermission();
+  }, []);
 
   function handlePost() {
     // setLoading(true);

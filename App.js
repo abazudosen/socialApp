@@ -1,3 +1,13 @@
+import { decode, encode } from "base-64";
+
+if (!global.btoa) {
+  global.btoa = encode;
+}
+
+if (!global.atob) {
+  global.atob = decode;
+}
+
 import React from "react";
 import FirebaseKeys from "./config";
 
@@ -19,8 +29,7 @@ import NotificationScreen from "./screens/NotificationScreen";
 
 import * as firebase from "firebase";
 
-const firebaseConfig = FirebaseKeys;
-
+// const firebaseConfig = FirebaseKeys;
 // Initialize Firebase
 // firebase.initializeApp(firebaseConfig);
 
@@ -54,6 +63,7 @@ const AppContainer = createStackNavigator(
                 color="#E9446A"
                 style={{
                   shadowColor: "#E9446A",
+                  elevation: 2,
                   shadowOffset: { width: 0, height: 0 },
                   shadowRadius: 10,
                   shadowOpacity: 0.3,
@@ -94,6 +104,7 @@ const AppContainer = createStackNavigator(
           inactiveTintColor: "#B8BBC4",
           showLabel: false,
         },
+        // initialRouteName: "Profile",
       }
     ),
     postModal: {
@@ -106,10 +117,15 @@ const AppContainer = createStackNavigator(
   }
 );
 
-const AuthStack = createStackNavigator({
-  Login: LoginScreen,
-  Register: RegisterScreen,
-});
+const AuthStack = createStackNavigator(
+  {
+    Login: LoginScreen,
+    Register: RegisterScreen,
+  }
+  // {
+  //   initialRouteName: "Register",
+  // }
+);
 
 export default createAppContainer(
   createSwitchNavigator(

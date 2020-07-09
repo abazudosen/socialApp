@@ -1,5 +1,6 @@
 import FirebaseKeys from "./config";
 import firebase from "firebase";
+import "@firebase/firestore";
 
 class Fire {
   constructor() {
@@ -14,24 +15,27 @@ class Fire {
       localUri,
       `photos/${this.uid}/${Date.now()}`
     );
-    const avatarUri = await this.uploadPhotoAsync(uri, `avatars/${this.uid}`);
-    firestore
-      .collection("posts")
-      .set({
-        // id: id,
-        name,
-        avatar: avatarUri,
-        text,
-        uid: this.uid,
-        timestamp: this.timestamp,
-        image: remoteUri,
-      })
-      .then(function (docRef) {
-        console.log("Document written with ID: ", docRef.id);
-      })
-      .catch(function (error) {
-        console.error("Error adding document: ", error);
-      });
+
+    //const avatarUri = await this.uploadPhotoAsync(uri, `avatars/${this.uid}`);
+    return new Promise(async (res, rej) => {
+      this.firestore
+        .collection("posts")
+        .add({
+          // id: id,
+          //name,
+          //avatar: avatarUri,
+          text,
+          uid: this.uid,
+          timestamp: this.timestamp,
+          image: remoteUri,
+        })
+        .then((docRef) => {
+          console.log("Document written with ID: ", res(docRef));
+        })
+        .catch((error) => {
+          console.error("Error adding document: ", rej(error));
+        });
+    });
   };
 
   uploadPhotoAsync = async (uri, filename) => {
@@ -55,6 +59,38 @@ class Fire {
     }).catch((error) => {
       console.error(error);
     });
+  };
+
+  createUser = async (user) => {
+    let remoteUri = null;
+
+    try {
+      await firebase
+        .auth()
+        .createUserWithEmailAndPassword(user.email, user.password);
+
+      let db = this.firestore.collection("users").doc(this.uid);
+
+      db.set({
+        name: user.name,
+        email: user.email,
+        avatar: null,
+      });
+
+      if (user.avatar) {
+        remoteUri = await this.uploadPhotoAsync(
+          user.avatar,
+          `avatars/${this.uid}`
+        );
+        db.set({ avatar: remoteUri }, { merge: true });
+      }
+    } catch (error) {
+      alert("Error: ", error);
+    }
+  };
+
+  signOut = () => {
+    firebase.auth().signOut();
   };
 
   get firestore() {
